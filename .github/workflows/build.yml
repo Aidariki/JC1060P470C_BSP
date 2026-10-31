@@ -1,0 +1,33 @@
+name: Build ESP32-P4 Firmware Binaries
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:release-v5.5
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build display_demo for ESP32-P4
+        run: |
+          . /opt/esp/idf/export.sh
+          cd examples/display_demo
+          idf.py build
+
+      - name: Upload compiled .bin firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: jc1060p470c_firmware_binaries
+          path: |
+            examples/display_demo/build/bootloader/bootloader.bin
+            examples/display_demo/build/partition_table/partition-table.bin
+            examples/display_demo/build/display_demo.bin
+            examples/display_demo/build/flasher_args.json
